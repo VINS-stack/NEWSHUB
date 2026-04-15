@@ -1,0 +1,310 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Search, Menu, MessageSquare, ThumbsUp, ThumbsDown, Eye, 
+  Clock, Share2, MoreHorizontal, TrendingUp, ShieldCheck, 
+  ChevronLeft, Flag, Download, Bookmark, Send
+} from 'lucide-react';
+
+const CATEGORIES = ["Terbaru", "Politik", "Teknologi", "Hiburan", "Olahraga", "Bisnis", "Gaya Hidup", "Sains"];
+
+const NEWS_DATA = [
+  {
+    id: 1,
+    title: "Inovasi AI Terbaru: Robot Kini Bisa Memasak Nasi Goreng Sempurna",
+    author: "TeknoGuru",
+    views: "1.2M",
+    likes: "95%",
+    duration: "04:20",
+    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800",
+    isVerified: true,
+    time: "2 jam yang lalu",
+    content: "Peneliti dari Silicon Valley baru saja memperkenalkan 'ChefBot-3000', sebuah robot bertenaga AI yang mampu menguasai teknik memasak nasi goreng khas Asia dengan presisi tinggi. Berbeda dengan mesin otomatis biasa, robot ini menggunakan sensor penciuman digital untuk memastikan tingkat kematangan bumbu dan aroma 'wok hei' yang pas. Proyek ini memakan waktu tiga tahun pengembangan dan diharapkan bisa membantu efisiensi di dapur-dapur komersial mulai akhir tahun ini."
+  },
+  {
+    id: 2,
+    title: "Prediksi Ekonomi 2026: Apakah Investasi Emas Masih Menguntungkan?",
+    author: "EkonomiNews",
+    views: "850K",
+    likes: "88%",
+    duration: "06:15",
+    image: "https://images.unsplash.com/photo-1518186239717-2e90987c3913?auto=format&fit=crop&q=80&w=800",
+    isVerified: true,
+    time: "5 jam yang lalu",
+    content: "Di tengah fluktuasi pasar global, para analis ekonomi menyarankan investor untuk tetap waspada. Emas tetap menjadi 'safe haven' utama, namun aset digital dan energi terbarukan mulai menunjukkan performa yang kompetitif. Laporan terbaru menunjukkan adanya kenaikan permintaan emas batangan di pasar Asia Tenggara sebesar 12% dibandingkan tahun lalu, dipicu oleh ketidakpastian suku bunga bank sentral."
+  },
+  {
+    id: 3,
+    title: "Skandal di Dunia Hiburan: Aktor Ternama Tertangkap Kamera di Mars",
+    author: "GosipHot",
+    views: "3.5M",
+    likes: "92%",
+    duration: "10:01",
+    image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800",
+    isVerified: false,
+    time: "10 jam yang lalu",
+    content: "Dunia maya digemparkan dengan bocornya foto yang diduga aktor peraih Oscar sedang bersantai di salah satu pangkalan SpaceX di Mars. Meski juru bicara aktor tersebut menyebut itu hanya bagian dari syuting film sci-fi terbaru, para penggemar berteori bahwa perjalanan wisata luar angkasa bagi kaum elit sudah dimulai secara rahasia. Foto tersebut menunjukkan sang aktor sedang memegang gelas kopi dengan latar belakang langit oranye kemerahan."
+  },
+  {
+    id: 4,
+    title: "Resep Rahasia Seblak Viral yang Disukai Alien di Galaksi Andromeda",
+    author: "KulinerLiar",
+    views: "420K",
+    likes: "99%",
+    duration: "03:45",
+    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800",
+    isVerified: true,
+    time: "1 hari yang lalu",
+    content: "Siapa sangka kerupuk basah dengan bumbu kencur yang pedas bisa menjadi sensasi intergalaksi? Sebuah eksperimen sosial menunjukkan bahwa cita rasa pedas eksotis dari seblak memiliki profil kimiawi yang menarik bagi indra perasa makhluk dari galaksi tetangga. Artikel ini membahas bagaimana teknik perendaman kerupuk yang tepat dan tingkat kepedasan 'level dewa' menjadi kunci utama kesuksesan kuliner ini."
+  }
+];
+
+export default function App() {
+  const [selectedArticle, setSelectedArticle] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleArticleClick = (article) => {
+    setSelectedArticle(article);
+    window.scrollTo(0, 0);
+  };
+
+  const closeArticle = () => {
+    setSelectedArticle(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-[#ccc] font-sans selection:bg-[#ff9900] selection:text-black">
+      {/* Header */}
+      <nav className="bg-[#1b1b1b] border-b border-[#333] sticky top-0 z-50">
+        <div className="max-w-[1400px] mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <Menu className="w-6 h-6 cursor-pointer hover:text-white" />
+            <div 
+              className="flex items-center font-black text-2xl tracking-tighter cursor-pointer group"
+              onClick={closeArticle}
+            >
+              <span className="text-white group-hover:text-[#ff9900] transition-colors">NEWS</span>
+              <span className="bg-[#ff9900] text-black px-1.5 py-0.5 rounded-md ml-1 group-hover:bg-white transition-colors">HUB</span>
+            </div>
+          </div>
+
+          <div className="hidden md:flex flex-1 max-w-2xl mx-10 relative">
+            <input 
+              type="text" 
+              placeholder="Cari berita terbaru..." 
+              className="w-full bg-black border border-[#444] rounded-l-md px-4 py-2 outline-none focus:border-[#ff9900] transition-colors"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button className="bg-[#444] hover:bg-[#555] px-6 rounded-r-md border-y border-r border-[#444] flex items-center">
+              <Search className="w-5 h-5 text-white" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4 font-bold text-sm">
+            <button className="bg-[#ff9900] text-black px-4 py-1.5 rounded-md hover:bg-white transition-all">Masuk</button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Categories Bar */}
+      {!selectedArticle && (
+        <div className="bg-[#282828] overflow-x-auto no-scrollbar border-b border-[#333]">
+          <div className="max-w-[1400px] mx-auto flex items-center gap-6 px-4 py-2 whitespace-nowrap text-sm font-bold uppercase tracking-wide">
+            {CATEGORIES.map((cat, i) => (
+              <a key={i} href="#" className="hover:text-[#ff9900]">{cat}</a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Main Layout */}
+      <main className="max-w-[1400px] mx-auto px-4 py-6">
+        {selectedArticle ? (
+          /* ARTICLE VIEW (Mirip Player UI) */
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Content */}
+            <div className="flex-1">
+              <div className="aspect-video w-full rounded-lg overflow-hidden bg-black mb-6 relative border border-[#333]">
+                <img 
+                  src={selectedArticle.image} 
+                  alt={selectedArticle.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                   <h1 className="text-white text-3xl font-black leading-tight tracking-tight drop-shadow-md">
+                    {selectedArticle.title}
+                   </h1>
+                </div>
+              </div>
+
+              {/* Action Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#333] pb-6 mb-6">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <button className="flex items-center gap-2 bg-[#222] hover:bg-[#333] px-4 py-2 rounded-l-full border-r border-[#444] font-bold text-white transition-all">
+                      <ThumbsUp className="w-5 h-5" /> 15K
+                    </button>
+                    <button className="flex items-center gap-2 bg-[#222] hover:bg-[#333] px-4 py-2 rounded-r-full font-bold transition-all">
+                      <ThumbsDown className="w-5 h-5" /> 230
+                    </button>
+                  </div>
+                  <button className="flex items-center gap-2 hover:text-white font-bold">
+                    <Share2 className="w-5 h-5" /> BAGIKAN
+                  </button>
+                  <button className="flex items-center gap-2 hover:text-white font-bold">
+                    <Download className="w-5 h-5" /> SIMPAN
+                  </button>
+                  <button className="flex items-center gap-2 hover:text-white font-bold">
+                    <Flag className="w-5 h-5" /> LAPORKAN
+                  </button>
+                </div>
+                <div className="text-sm font-bold">
+                   <span className="text-white">{selectedArticle.views}</span> DIBACA
+                </div>
+              </div>
+
+              {/* Author & Full Content */}
+              <div className="bg-[#1b1b1b] p-6 rounded-lg border border-[#333]">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-[#ff9900] rounded-full flex items-center justify-center text-black font-black text-xl">
+                      {selectedArticle.author[0]}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-white font-bold">{selectedArticle.author}</span>
+                        {selectedArticle.isVerified && <ShieldCheck className="w-4 h-4 text-blue-400" fill="currentColor" />}
+                      </div>
+                      <span className="text-xs font-bold text-[#888]">150K Pengikut</span>
+                    </div>
+                  </div>
+                  <button className="bg-[#ff9900] text-black px-6 py-2 rounded-md font-bold hover:bg-white transition-all">IKUTI</button>
+                </div>
+
+                <div className="text-[#eee] leading-relaxed text-lg whitespace-pre-wrap mb-8">
+                  {selectedArticle.content}
+                </div>
+                
+                <div className="text-xs font-bold text-[#666]">
+                  Dipublikasikan pada {selectedArticle.time} • Kategori: {selectedArticle.category || 'Utama'}
+                </div>
+              </div>
+
+              {/* Comments Section Dummy */}
+              <div className="mt-10 mb-20">
+                <h3 className="text-xl font-bold text-white mb-6">1.234 Komentar</h3>
+                <div className="flex gap-4 mb-8">
+                  <div className="w-10 h-10 bg-gray-700 rounded-full shrink-0"></div>
+                  <div className="flex-1 relative">
+                    <input 
+                      type="text" 
+                      placeholder="Tambahkan komentar publik..." 
+                      className="w-full bg-transparent border-b border-[#333] focus:border-[#ff9900] py-2 outline-none transition-colors"
+                    />
+                    <div className="flex justify-end mt-2">
+                       <button className="bg-[#333] px-4 py-2 rounded-md font-bold text-sm">BATAL</button>
+                       <button className="bg-[#ff9900] text-black px-4 py-2 rounded-md font-bold text-sm ml-3">KOMENTAR</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar (Berita Terkait) */}
+            <div className="w-full lg:w-[400px] shrink-0">
+               <div className="flex items-center justify-between mb-4">
+                 <h4 className="font-bold text-white uppercase text-sm">Berita Terkait</h4>
+                 <div className="flex items-center gap-2 text-xs font-bold">
+                   AUTOPLAY <div className="w-8 h-4 bg-[#ff9900] rounded-full relative"><div className="absolute right-0.5 top-0.5 w-3 h-3 bg-black rounded-full"></div></div>
+                 </div>
+               </div>
+               <div className="space-y-4">
+                 {NEWS_DATA.filter(n => n.id !== selectedArticle.id).map(item => (
+                   <div 
+                    key={item.id} 
+                    className="flex gap-3 group cursor-pointer"
+                    onClick={() => handleArticleClick(item)}
+                   >
+                     <div className="relative w-[168px] h-[94px] shrink-0 rounded overflow-hidden">
+                       <img src={item.image} className="w-full h-full object-cover" alt="" />
+                       <span className="absolute bottom-1 right-1 bg-black/80 text-[10px] px-1 font-bold rounded">{item.duration}</span>
+                     </div>
+                     <div className="flex-1">
+                        <h5 className="text-white text-sm font-bold line-clamp-2 leading-tight mb-1 group-hover:text-[#ff9900]">
+                          {item.title}
+                        </h5>
+                        <div className="text-[11px] font-bold text-[#888]">
+                          <div className="hover:text-white">{item.author}</div>
+                          <div>{item.views} Views • {item.time}</div>
+                        </div>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+            </div>
+          </div>
+        ) : (
+          /* HOME GRID VIEW */
+          <>
+            <div className="flex items-center gap-2 mb-6 border-b border-[#333] pb-4">
+              <TrendingUp className="text-[#ff9900] w-6 h-6" />
+              <h2 className="text-xl font-bold text-white tracking-tight uppercase italic">Rekomendasi Utama</h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-10">
+              {NEWS_DATA.map((news) => (
+                <div key={news.id} className="group cursor-pointer" onClick={() => handleArticleClick(news)}>
+                  <div className="relative aspect-video rounded-lg overflow-hidden bg-[#222] mb-3">
+                    <img 
+                      src={news.image} 
+                      alt={news.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[11px] font-bold px-1.5 py-0.5 rounded border border-[#333]">
+                      {news.duration}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="w-9 h-9 bg-gray-800 rounded-full shrink-0 flex items-center justify-center font-bold text-xs text-[#ff9900]">
+                      {news.author[0]}
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold leading-tight line-clamp-2 text-[15px] mb-1 group-hover:text-[#ff9900]">
+                        {news.title}
+                      </h3>
+                      <div className="flex flex-col text-[12px] font-bold text-[#888]">
+                        <span className="hover:text-white flex items-center gap-1">
+                          {news.author} {news.isVerified && <ShieldCheck className="w-3 h-3 text-blue-400" fill="currentColor" />}
+                        </span>
+                        <span>{news.views} Views • {news.time}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-[#1b1b1b] border-t border-[#333] mt-20 py-10">
+        <div className="max-w-[1400px] mx-auto px-4 text-center">
+          <div className="flex items-center justify-center font-black text-3xl tracking-tighter mb-4" onClick={closeArticle}>
+            <span className="text-white">NEWS</span>
+            <span className="bg-[#ff9900] text-black px-1.5 py-0.5 rounded-md ml-1">HUB</span>
+          </div>
+          <p className="text-xs text-[#666] font-bold">
+            Portal Berita Independen & Terpercaya • &copy; 2026
+          </p>
+        </div>
+      </footer>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}} />
+    </div>
+  );
+}
